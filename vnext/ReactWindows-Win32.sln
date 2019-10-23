@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27310.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FollyWin32", "FollyWin32\FollyWin32.vcxproj", "{74085F13-2DDE-45E5-A0CA-927AC9D0B953}"
 EndProject
@@ -16,8 +16,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReactCommon", "ReactCommon\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Desktop.SampleApp", "Desktop.SampleApp\Desktop.SampleApp.vcxproj", "{BB8DB91C-44CE-4BFB-B9B7-E27C7D98D716}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JSI.Desktop", "JSI\Desktop\JSI.Desktop.vcxproj", "{17DD1B17-3094-40DD-9373-AC2497932ECA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JSI.Shared", "JSI\Shared\JSI.Shared.vcxitems", "{0CC28589-39E4-4288-B162-97B959F8B843}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		JSI\Shared\JSI.Shared.vcxitems*{0cc28589-39e4-4288-b162-97b959f8b843}*SharedItemsImports = 9
+		JSI\Shared\JSI.Shared.vcxitems*{17dd1b17-3094-40dd-9373-ac2497932eca}*SharedItemsImports = 4
 		Chakra\Chakra.vcxitems*{95048601-c3dc-475f-adf8-7c0c764c10d5}*SharedItemsImports = 4
 		Shared\Shared.vcxitems*{95048601-c3dc-475f-adf8-7c0c764c10d5}*SharedItemsImports = 4
 	EndGlobalSection
@@ -106,6 +114,28 @@ Global
 		{BB8DB91C-44CE-4BFB-B9B7-E27C7D98D716}.Release|Win32.Build.0 = Release|Win32
 		{BB8DB91C-44CE-4BFB-B9B7-E27C7D98D716}.Release|x64.ActiveCfg = Release|x64
 		{BB8DB91C-44CE-4BFB-B9B7-E27C7D98D716}.Release|x64.Build.0 = Release|x64
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Debug|ARM.ActiveCfg = Debug|ARM
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Debug|ARM.Build.0 = Debug|ARM
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Debug|Win32.Build.0 = Debug|Win32
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Debug|x64.ActiveCfg = Debug|x64
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Debug|x64.Build.0 = Debug|x64
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Release|ARM.ActiveCfg = Release|ARM
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Release|ARM.Build.0 = Release|ARM
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Release|Win32.ActiveCfg = Release|Win32
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Release|Win32.Build.0 = Release|Win32
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Release|x64.ActiveCfg = Release|x64
+		{FCA38F3C-7C73-4C47-BE4E-32F77FA8538D}.Release|x64.Build.0 = Release|x64
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Debug|ARM.ActiveCfg = Debug|Win32
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Debug|Win32.Build.0 = Debug|Win32
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Debug|x64.ActiveCfg = Debug|x64
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Debug|x64.Build.0 = Debug|x64
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Release|ARM.ActiveCfg = Release|Win32
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Release|Win32.ActiveCfg = Release|Win32
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Release|Win32.Build.0 = Release|Win32
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Release|x64.ActiveCfg = Release|x64
+		{17DD1B17-3094-40DD-9373-AC2497932ECA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
