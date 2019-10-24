@@ -4,11 +4,13 @@
 #include "Desktop.SampleApp.h"
 
 #include "DispatcherQueueMessageQueues.h"
+#include "NativeUIManager.h"
 
 #include <memory>
 
 #include <InstanceManager.h>
 
+#include <Modules/UIManagerModule.h>
 #include <winrt/Windows.UI.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
 #include <winrt/Windows.UI.Xaml.Hosting.h>
@@ -69,11 +71,10 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::string,
         facebook::xplat::module::CxxModule::Provider,
         std::shared_ptr<facebook::react::MessageQueueThread>>> cxxModules;
-      std::shared_ptr<facebook::react::IUIManager> uimanager;
-      std::shared_ptr<facebook::react::MessageQueueThread> jsQueue =
-        std::make_shared<Microsoft::React::BGThreadDispatcherQueueMessageQueue>();
-      std::shared_ptr<facebook::react::MessageQueueThread> nativeQueue =
-        std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
+      std::vector<std::unique_ptr<facebook::react::IViewManager>> viewManagers;
+      auto uimanager = std::make_shared<facebook::react::UIManager>(std::move(viewManagers), new react::uwp::NativeUIManager());
+      auto jsQueue = std::make_shared<Microsoft::React::BGThreadDispatcherQueueMessageQueue>();
+      auto nativeQueue = std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
       auto devSettings = std::make_shared<facebook::react::DevSettings>();
 
       pHwndData->reactInstance = facebook::react::CreateReactInstance(
