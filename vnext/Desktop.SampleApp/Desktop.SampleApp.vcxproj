@@ -158,12 +158,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Desktop.SampleApp.h" />
+    <ClInclude Include="DispatcherQueueMessageQueues.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Desktop.SampleApp.cpp" />
+    <ClCompile Include="DispatcherQueueMessageQueues.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -195,9 +197,7 @@
     <DependentDLLs Include="$(BaseOutDir)\React.Windows.Desktop.DLL\react-native-win32.dll;$(BaseOutDir)\React.Windows.Desktop.DLL\ChakraCore.dll" />
   </ItemGroup>
   <Target Name="CopyReactNativeDLLToTarget" AfterTargets="Link">
-    <Copy
-      SourceFiles="@(DependentDLLs)"
-      DestinationFiles="@(DependentDLLs->'$(BaseOutDir)\$(ProjectName)\%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(DependentDLLs)" DestinationFiles="@(DependentDLLs->'$(BaseOutDir)\$(ProjectName)\%(Filename)%(Extension)')" />
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

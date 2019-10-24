@@ -2,6 +2,9 @@
 //
 #include "stdafx.h"
 #include "Desktop.SampleApp.h"
+
+#include "DispatcherQueueMessageQueues.h"
+
 #include <memory>
 
 #include <InstanceManager.h>
@@ -12,6 +15,7 @@
 #include <winrt/Windows.UI.Xaml.Media.h>
 #include <Windows.UI.Xaml.Hosting.DesktopWindowXamlSource.h>
 
+namespace WS = winrt::Windows::System;
 namespace WU = winrt::Windows::UI;
 namespace WUX = WU::Xaml;
 namespace WUXC = ::WUX::Controls;
@@ -19,6 +23,12 @@ namespace WUXH = ::WUX::Hosting;
 namespace WUXM = ::WUX::Media;
 
 HINSTANCE hinst;
+
+struct HwndData
+{
+  winrt::com_ptr<IDesktopWindowXamlSourceNative> desktopWindowXamlSourceNative;
+  std::shared_ptr<facebook::react::InstanceWrapper> reactInstance;
+};
 
 // Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -47,12 +57,12 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   {
     case WM_CREATE: {
       auto createStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
-      auto dwxsn = static_cast<IDesktopWindowXamlSourceNative*>(createStruct->lpCreateParams);
+      auto pHwndData = static_cast<HwndData*>(createStruct->lpCreateParams);
 
-      winrt::check_hresult(dwxsn->AttachToWindow(hWnd));
+      winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->AttachToWindow(hWnd));
 
       HWND interopHwnd;
-      winrt::check_hresult(dwxsn->get_WindowHandle(&interopHwnd));
+      winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->get_WindowHandle(&interopHwnd));
 
       std::string jsBundlePath;
       std::vector<std::tuple<
@@ -60,11 +70,13 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         facebook::xplat::module::CxxModule::Provider,
         std::shared_ptr<facebook::react::MessageQueueThread>>> cxxModules;
       std::shared_ptr<facebook::react::IUIManager> uimanager;
-      std::shared_ptr<facebook::react::MessageQueueThread> jsQueue;
-      std::shared_ptr<facebook::react::MessageQueueThread> nativeQueue;
+      std::shared_ptr<facebook::react::MessageQueueThread> jsQueue =
+        std::make_shared<Microsoft::React::BGThreadDispatcherQueueMessageQueue>();
+      std::shared_ptr<facebook::react::MessageQueueThread> nativeQueue =
+        std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
       auto devSettings = std::make_shared<facebook::react::DevSettings>();
 
-      auto instance = facebook::react::CreateReactInstance(
+      pHwndData->reactInstance = facebook::react::CreateReactInstance(
         std::move(jsBundlePath),
         std::move(cxxModules),
         std::move(uimanager),
@@ -74,14 +86,14 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
       SetWindowPos(interopHwnd, 0, 0, 0, createStruct->cx, createStruct->cy, SWP_SHOWWINDOW);
 
-      SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(dwxsn));
+      SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pHwndData));
     } break;
     case WM_WINDOWPOSCHANGED: {
       auto windowPos = reinterpret_cast<WINDOWPOS*>(lParam);
-      auto dwxsn = reinterpret_cast<IDesktopWindowXamlSourceNative*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+      auto pHwndData = reinterpret_cast<HwndData*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 
       HWND interopHwnd;
-      winrt::check_hresult(dwxsn->get_WindowHandle(&interopHwnd));
+      winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->get_WindowHandle(&interopHwnd));
 
       SetWindowPos(interopHwnd, 0, 0, 0, windowPos->cx, windowPos->cy, SWP_SHOWWINDOW);
     } break;
@@ -106,6 +118,9 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       EndPaint(hWnd, &ps);
     } break;
     case WM_DESTROY: {
+      auto pHwndData = reinterpret_cast<HwndData*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+      SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
+      delete pHwndData;
       PostQuitMessage(0);
     } break;
     default:
@@ -144,7 +159,6 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCm
   winrt::init_apartment(winrt::apartment_type::single_threaded);
 
   WUXH::DesktopWindowXamlSource windowsXamlDesktopSource {};
-
   auto textBlock = WUXC::TextBlock();
 
   textBlock.Text(winrt::hstring(L"test!"));
@@ -154,7 +168,8 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCm
 
   auto windowAtom = RegisterWindowClass();
 
-  auto desktopWindowXamlSourceNative = windowsXamlDesktopSource.as<IDesktopWindowXamlSourceNative>();
+  auto hwndData = std::make_unique<HwndData>();
+  hwndData->desktopWindowXamlSourceNative = windowsXamlDesktopSource.as<IDesktopWindowXamlSourceNative>();
 
   HWND hWnd = CreateWindowW(
     MAKEINTATOM(windowAtom),
@@ -167,11 +182,15 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCm
     nullptr,
     nullptr,
     hinst,
-    desktopWindowXamlSourceNative.get());
+    hwndData.get());
 
   if (!hWnd)
   {
     return -1;
+  }
+  else
+  {
+    hwndData.release();
   }
 
   auto desktopWindowXamlSourceNative2 = windowsXamlDesktopSource.try_as<IDesktopWindowXamlSourceNative2>();
@@ -202,8 +221,6 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCm
     }
   }
 
-  desktopWindowXamlSourceNative = nullptr;
-  desktopWindowXamlSourceNative2 = nullptr;
   windowsXamlDesktopSource = nullptr;
 
   winrt::uninit_apartment();

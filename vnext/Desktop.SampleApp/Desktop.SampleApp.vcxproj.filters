@@ -27,12 +27,18 @@
     <ClInclude Include="Desktop.SampleApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DispatcherQueueMessageQueues.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Desktop.SampleApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DispatcherQueueMessageQueues.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
