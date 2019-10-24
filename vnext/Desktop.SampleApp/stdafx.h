@@ -5,11 +5,13 @@
 
 #pragma once
 
+#define FOLLY_NO_CONFIG
 
 #include "targetver.h"
 
 #define _SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
 #define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files
 #include <windows.h>
@@ -27,8 +29,16 @@
 
 #include <unknwn.h>
 #include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.System.h>
+#include <winrt/Windows.UI.Composition.h>
+#include <winrt/Windows.UI.Xaml.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
 #include <winrt/Windows.UI.Xaml.Hosting.h>
+#include <winrt/Windows.UI.Xaml.Input.h>
+#include <winrt/Windows.UI.Xaml.Media.h>
+#include <WindowsNumerics.h>
+
 
 #pragma pop_macro("TRY")
 #pragma pop_macro("GetCurrentTime")

@@ -33,6 +33,27 @@
     <ClInclude Include="NativeUIManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowNodeBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewManagerBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XamlView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XamlView.cpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReactRootView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewViewManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameworkElementViewManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -45,6 +66,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NativeUIManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowNodeBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReactRootView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewManagerBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

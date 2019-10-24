@@ -1,10 +1,12 @@
-// Desktop.SampleApp.cpp : Defines the entry point for the application.
-//
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 #include "stdafx.h"
 #include "Desktop.SampleApp.h"
 
 #include "DispatcherQueueMessageQueues.h"
 #include "NativeUIManager.h"
+#include "ViewViewManager.h"
 
 #include <memory>
 
@@ -29,7 +31,7 @@ HINSTANCE hinst;
 struct HwndData
 {
   winrt::com_ptr<IDesktopWindowXamlSourceNative> desktopWindowXamlSourceNative;
-  std::shared_ptr<facebook::react::InstanceWrapper> reactInstance;
+  std::shared_ptr<facebook::react::Instance> reactInstance;
 };
 
 // Message handler for about box.
@@ -71,7 +73,9 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::string,
         facebook::xplat::module::CxxModule::Provider,
         std::shared_ptr<facebook::react::MessageQueueThread>>> cxxModules;
-      std::vector<std::unique_ptr<facebook::react::IViewManager>> viewManagers;
+      std::vector<std::unique_ptr<facebook::react::IViewManager>> viewManagers {
+        std::make_unique<ViewViewManager>(instance);
+      };
       auto uimanager = std::make_shared<facebook::react::UIManager>(std::move(viewManagers), new react::uwp::NativeUIManager());
       auto jsQueue = std::make_shared<Microsoft::React::BGThreadDispatcherQueueMessageQueue>();
       auto nativeQueue = std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
@@ -83,7 +87,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::move(uimanager),
         std::move(jsQueue),
         std::move(nativeQueue),
-        std::move(devSettings));
+        std::move(devSettings))->GetInstance();
 
       SetWindowPos(interopHwnd, 0, 0, 0, createStruct->cx, createStruct->cy, SWP_SHOWWINDOW);
 

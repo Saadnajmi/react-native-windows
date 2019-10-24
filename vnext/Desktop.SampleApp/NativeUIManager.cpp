@@ -4,12 +4,12 @@
 #include "stdafx.h"
 
 #include "NativeUIManager.h"
-
-#include <ReactRootView.h>
-#include <Views/ShadowNodeBase.h>
+#include "ShadowNodeBase.h"
+#include "ReactRootView.h"
 
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Input.h>
 #include <winrt/Windows.UI.Xaml.Media.h>
 
 namespace winrt {
@@ -17,6 +17,7 @@ using namespace Windows::Foundation;
 using namespace Windows::UI;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
+using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Media;
 } // namespace winrt
 
@@ -221,10 +222,10 @@ void NativeUIManager::AddRootView(
   facebook::react::IReactRootView* pReactRootView)
 {
   ShadowNodeBase& node = static_cast<ShadowNodeBase&>(shadowNode);
-  auto xamlRootView = static_cast<IXamlRootView*>(pReactRootView);
+  auto xamlRootView = static_cast<ReactRootView*>(pReactRootView);
   XamlView view = xamlRootView->GetXamlView();
   m_tagsToXamlReactControl.emplace(
-    shadowNode.m_tag, xamlRootView->GetXamlReactControl());
+    shadowNode.m_tag, xamlRootView->shared_from_this());
 
   m_tagsToYogaNodes.emplace(shadowNode.m_tag, make_yoga_node());
 

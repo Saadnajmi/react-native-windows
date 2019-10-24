@@ -5,7 +5,7 @@
 
 #include <INativeUIManager.h>
 #include <IReactRootView.h>
-#include <Views/ViewManagerBase.h>
+#include "ViewManagerBase.h"
 
 #include <winrt/Windows.UI.Xaml.h>
 
@@ -96,11 +96,11 @@ public:
   // XamlIsland/AppWindow scenarios. Since it doesn't have parent, and all nodes
   // in the tree should have the same XamlRoot, this function iterates all roots
   // and try to get a valid XamlRoot.
-  winrt::XamlRoot tryGetXamlRoot();
+  winrt::Windows::UI::Xaml::XamlRoot tryGetXamlRoot();
 
   // Searches itself and its parent to get a valid XamlView.
   // Like Mouse/Keyboard, the event source may not have matched XamlView.
-  XamlView reactPeerOrContainerFrom(winrt::FrameworkElement fe);
+  XamlView reactPeerOrContainerFrom(winrt::Windows::UI::Xaml::FrameworkElement fe);
 
 private:
   void DoLayout();
