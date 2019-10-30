@@ -68,15 +68,15 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       HWND interopHwnd;
       winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->get_WindowHandle(&interopHwnd));
 
+      auto nativeUIManager = std::make_shared<react::uwp::NativeUIManager>();
       std::string jsBundlePath;
       std::vector<std::tuple<
         std::string,
         facebook::xplat::module::CxxModule::Provider,
         std::shared_ptr<facebook::react::MessageQueueThread>>> cxxModules;
-      std::vector<std::unique_ptr<facebook::react::IViewManager>> viewManagers {
-        std::make_unique<ViewViewManager>(instance);
-      };
-      auto uimanager = std::make_shared<facebook::react::UIManager>(std::move(viewManagers), new react::uwp::NativeUIManager());
+      std::vector<std::unique_ptr<facebook::react::IViewManager>> viewManagers;
+      viewManagers.push_back(std::make_unique<react::uwp::ViewViewManager>(nativeUIManager));
+      auto uimanager = std::make_shared<facebook::react::UIManager>(std::move(viewManagers), nativeUIManager.get());
       auto jsQueue = std::make_shared<Microsoft::React::BGThreadDispatcherQueueMessageQueue>();
       auto nativeQueue = std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
       auto devSettings = std::make_shared<facebook::react::DevSettings>();

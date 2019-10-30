@@ -3,12 +3,8 @@
 
 #pragma once
 
+#include "NativeUIManager.h"
 #include "FrameworkElementViewManager.h"
-#include "ViewPanel.h"
-
-namespace winrt {
-using ContentControl = winrt::Windows::UI::Xaml::Controls::ContentControl;
-}
 
 namespace react::uwp {
 
@@ -19,7 +15,7 @@ class ViewViewManager : public FrameworkElementViewManager
   using Super = FrameworkElementViewManager;
 
 public:
-  ViewViewManager(const std::shared_ptr<IReactInstance>& reactInstance);
+  explicit ViewViewManager(const std::shared_ptr<react::uwp::NativeUIManager>& spNativeUIManager);
 
   const char* GetName() const override;
 
@@ -44,7 +40,7 @@ protected:
   XamlView CreateViewCore(int64_t tag) override;
   void TryUpdateView(
     ViewShadowNode* viewShadowNode,
-    winrt::Windows::UI::Xaml::Controls::Panel panel,
+    winrt::Windows::UI::Xaml::Controls::RelativePanel& panel,
     bool useControl);
 };
 
