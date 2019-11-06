@@ -28,7 +28,6 @@ struct INativeUIManagerHost {
 };
 
 struct INativeUIManager {
-  virtual void destroy() = 0;
   virtual ShadowNode *createRootShadowNode(IReactRootView *rootView) = 0;
   virtual void configureNextLayoutAnimation(
       folly::dynamic &&config,

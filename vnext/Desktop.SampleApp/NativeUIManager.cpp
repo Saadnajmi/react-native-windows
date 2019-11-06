@@ -240,11 +240,6 @@ void NativeUIManager::AddRootView(
     }));
 }
 
-void NativeUIManager::destroy()
-{
-  delete this;
-}
-
 void NativeUIManager::removeRootView(facebook::react::ShadowNode& shadow)
 {
   m_tagsToXamlReactControl.erase(shadow.m_tag);

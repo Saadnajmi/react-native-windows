@@ -45,7 +45,6 @@ public:
     facebook::xplat::module::CxxModule::Callback error) override
   {
   };
-  void destroy() override;
   void destroyRootShadowNode(facebook::react::ShadowNode*) override;
   void removeRootView(facebook::react::ShadowNode& rootshadow) override;
   void setHost(facebook::react::INativeUIManagerHost* host) override;

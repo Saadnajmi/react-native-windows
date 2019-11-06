@@ -19,8 +19,8 @@ using namespace facebook::xplat;
 namespace facebook {
 namespace react {
 
-UIManager::UIManager(std::vector<std::unique_ptr<IViewManager>> &&viewManagers, INativeUIManager *nativeManager)
-    : m_viewManagers(std::move(viewManagers)), m_nativeUIManager(nativeManager) {
+UIManager::UIManager(std::vector<std::unique_ptr<IViewManager>>&& viewManagers, std::shared_ptr<INativeUIManager>&& nativeManager)
+    : m_viewManagers(std::move(viewManagers)), m_nativeUIManager(std::move(nativeManager)) {
   m_nativeUIManager->setHost(this);
 }
 
@@ -28,7 +28,7 @@ UIManager::~UIManager() {
   m_nodeRegistry.removeAllRootViews([this](int64_t rootViewTag) { removeRootView(rootViewTag); });
 
   m_nativeUIManager->setHost(nullptr);
-  m_nativeUIManager->destroy();
+  m_nativeUIManager = nullptr;
 }
 
 folly::dynamic UIManager::getConstantsForViewManager(const std::string &className) {
@@ -517,8 +517,8 @@ std::vector<facebook::xplat::module::CxxModule::Method> UIManagerModule::getMeth
 
 shared_ptr<IUIManager> createIUIManager(
     std::vector<std::unique_ptr<IViewManager>> &&viewManagers,
-    INativeUIManager *nativeManager) {
-  return std::make_shared<UIManager>(std::move(viewManagers), nativeManager);
+    std::shared_ptr<INativeUIManager>&& nativeManager) {
+  return std::make_shared<UIManager>(std::move(viewManagers), std::move(nativeManager));
 }
 
 std::unique_ptr<facebook::xplat::module::CxxModule> createUIManagerModule(std::shared_ptr<IUIManager> uimanager) {

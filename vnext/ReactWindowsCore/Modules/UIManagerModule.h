@@ -17,7 +17,7 @@ struct ShadowNode;
 
 class UIManager : public IUIManager, INativeUIManagerHost {
  public:
-  UIManager(std::vector<std::unique_ptr<IViewManager>> &&viewManagers, INativeUIManager *nativeManager);
+  UIManager(std::vector<std::unique_ptr<IViewManager>> &&viewManagers, std::shared_ptr<INativeUIManager>&& nativeManager);
   virtual ~UIManager() noexcept;
 
   void RegisterRootView(IReactRootView *rootView, int64_t rootViewTag, int64_t width, int64_t height);
@@ -52,7 +52,7 @@ class UIManager : public IUIManager, INativeUIManagerHost {
       folly::dynamic &&coordinates,
       facebook::xplat::module::CxxModule::Callback callback) override;
   INativeUIManager *getNativeUIManager() override {
-    return m_nativeUIManager;
+    return m_nativeUIManager.get();
   }
 
   void focus(int64_t reactTag) override;
@@ -67,7 +67,7 @@ class UIManager : public IUIManager, INativeUIManagerHost {
  private:
   std::vector<std::unique_ptr<IViewManager>> m_viewManagers;
   ShadowNodeRegistry m_nodeRegistry;
-  INativeUIManager *m_nativeUIManager;
+  std::shared_ptr<INativeUIManager> m_nativeUIManager;
 
   void manageChildren(
       int64_t viewTag,

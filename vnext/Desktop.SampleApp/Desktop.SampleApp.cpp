@@ -31,7 +31,7 @@ HINSTANCE hinst;
 struct HwndData
 {
   winrt::com_ptr<IDesktopWindowXamlSourceNative> desktopWindowXamlSourceNative;
-  std::shared_ptr<facebook::react::Instance> reactInstance;
+  std::shared_ptr<facebook::react::InstanceWrapper> reactInstance;
 };
 
 // Message handler for about box.
@@ -76,7 +76,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::shared_ptr<facebook::react::MessageQueueThread>>> cxxModules;
       std::vector<std::unique_ptr<facebook::react::IViewManager>> viewManagers;
       viewManagers.push_back(std::make_unique<react::uwp::ViewViewManager>(nativeUIManager));
-      auto uimanager = std::make_shared<facebook::react::UIManager>(std::move(viewManagers), nativeUIManager.get());
+      auto uimanager = std::make_shared<facebook::react::UIManager>(std::move(viewManagers), nativeUIManager);
       auto jsQueue = std::make_shared<Microsoft::React::BGThreadDispatcherQueueMessageQueue>();
       auto nativeQueue = std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
       auto devSettings = std::make_shared<facebook::react::DevSettings>();
@@ -87,7 +87,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::move(uimanager),
         std::move(jsQueue),
         std::move(nativeQueue),
-        std::move(devSettings))->GetInstance();
+        std::move(devSettings));
 
       SetWindowPos(interopHwnd, 0, 0, 0, createStruct->cx, createStruct->cy, SWP_SHOWWINDOW);
 
