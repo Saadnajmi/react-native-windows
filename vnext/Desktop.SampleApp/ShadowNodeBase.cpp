@@ -144,4 +144,20 @@ void ShadowNodeBase::UpdateTransformPS()
   }
 }
 
+void ShadowNodeBase::UpdateHandledKeyboardEvents(std::string const& propertyName, folly::dynamic const& value)
+{
+  //EnsureHandledKeyboardEventHandler();
+  //m_handledKeyboardEventHandler->UpdateHandledKeyboardEvents(propertyName, value);
+}
+
+void ShadowNodeBase::EnsureHandledKeyboardEventHandler()
+{
+  //if (!m_handledKeyboardEventHandler)
+  //{
+  //  assert(m_view);
+  //  m_handledKeyboardEventHandler = std::make_unique<HandledKeyboardEventHandler>();
+  //  m_handledKeyboardEventHandler->hook(m_view);
+  //}
+}
+
 }

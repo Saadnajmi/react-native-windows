@@ -82,6 +82,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
+  <Import Project="$(ReactNativeWindowsDir)\PropertySheets\ReactCommunity.cpp.props" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -93,6 +94,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <CallingConvention>StdCall</CallingConvention>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -171,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="Desktop.SampleApp.cpp" />
     <ClCompile Include="DispatcherQueueMessageQueues.cpp" />
+    <ClCompile Include="FrameworkElementViewManager.cpp" />
     <ClCompile Include="NativeUIManager.cpp" />
     <ClCompile Include="ReactRootView.cpp" />
     <ClCompile Include="ShadowNodeBase.cpp" />

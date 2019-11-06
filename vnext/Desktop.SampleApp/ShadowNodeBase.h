@@ -119,6 +119,9 @@ struct ShadowNodeBase : public facebook::react::ShadowNode
   winrt::Windows::UI::Composition::CompositionPropertySet EnsureTransformPS();
   void UpdateTransformPS();
 
+  void UpdateHandledKeyboardEvents(std::string const& propertyName, folly::dynamic const& value);
+  void EnsureHandledKeyboardEventHandler();
+
 protected:
   XamlView m_view;
   bool m_updating = false;
