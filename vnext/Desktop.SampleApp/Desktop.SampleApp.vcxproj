@@ -215,6 +215,7 @@
   </ItemGroup>
   <Target Name="CopyReactNativeDLLToTarget" AfterTargets="Link">
     <Copy SourceFiles="@(DependentDLLs)" DestinationFiles="@(DependentDLLs->'$(BaseOutDir)\$(ProjectName)\%(Filename)%(Extension)')" />
+    <Copy SourceFiles="TestBundle.js" DestinationFiles="$(BaseOutDir)\$(ProjectName)\TestBundle.js" />
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

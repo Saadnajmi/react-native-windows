@@ -69,7 +69,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->get_WindowHandle(&interopHwnd));
 
       auto nativeUIManager = std::make_shared<react::uwp::NativeUIManager>();
-      std::string jsBundlePath;
+      std::string jsBundlePath = "Samples/text.bundle";
       std::vector<std::tuple<
         std::string,
         facebook::xplat::module::CxxModule::Provider,
@@ -80,6 +80,11 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       auto jsQueue = std::make_shared<Microsoft::React::BGThreadDispatcherQueueMessageQueue>();
       auto nativeQueue = std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
       auto devSettings = std::make_shared<facebook::react::DevSettings>();
+      devSettings->useWebDebugger = true;
+      devSettings->errorCallback = [hWnd](std::string err)
+      {
+        ::MessageBoxA(hWnd, err.c_str(), "React Native Error", MB_OK);
+      };
 
       pHwndData->reactInstance = facebook::react::CreateReactInstance(
         std::move(jsBundlePath),
@@ -164,12 +169,6 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCm
   winrt::init_apartment(winrt::apartment_type::single_threaded);
 
   WUXH::DesktopWindowXamlSource windowsXamlDesktopSource {};
-  auto textBlock = WUXC::TextBlock();
-
-  textBlock.Text(winrt::hstring(L"test!"));
-  textBlock.Foreground(WUXM::SolidColorBrush(winrt::Windows::UI::Color { 0xFF, 0x75, 0xD5, 0x5 }));
-
-  windowsXamlDesktopSource.Content(textBlock);
 
   auto windowAtom = RegisterWindowClass();
 
