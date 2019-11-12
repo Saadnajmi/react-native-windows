@@ -83,6 +83,11 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <Import Project="$(ReactNativeWindowsDir)\PropertySheets\ReactCommunity.cpp.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>RN_PLATFORM=windows;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -215,7 +220,6 @@
   </ItemGroup>
   <Target Name="CopyReactNativeDLLToTarget" AfterTargets="Link">
     <Copy SourceFiles="@(DependentDLLs)" DestinationFiles="@(DependentDLLs->'$(BaseOutDir)\$(ProjectName)\%(Filename)%(Extension)')" />
-    <Copy SourceFiles="TestBundle.js" DestinationFiles="$(BaseOutDir)\$(ProjectName)\TestBundle.js" />
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

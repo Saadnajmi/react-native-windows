@@ -60,6 +60,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   switch (message)
   {
     case WM_CREATE: {
+      static constexpr std::string_view bundlePath = "Samples/text.bundle";
       auto createStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
       auto pHwndData = static_cast<HwndData*>(createStruct->lpCreateParams);
 
@@ -69,7 +70,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->get_WindowHandle(&interopHwnd));
 
       auto nativeUIManager = std::make_shared<react::uwp::NativeUIManager>();
-      std::string jsBundlePath = "Samples/text.bundle";
+      std::string jsBundlePath { bundlePath };
       std::vector<std::tuple<
         std::string,
         facebook::xplat::module::CxxModule::Provider,
@@ -81,6 +82,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       auto nativeQueue = std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
       auto devSettings = std::make_shared<facebook::react::DevSettings>();
       devSettings->useWebDebugger = true;
+      devSettings->debugBundlePath = bundlePath;
       devSettings->errorCallback = [hWnd](std::string err)
       {
         ::MessageBoxA(hWnd, err.c_str(), "React Native Error", MB_OK);
@@ -93,6 +95,8 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::move(jsQueue),
         std::move(nativeQueue),
         std::move(devSettings));
+
+      pHwndData->reactInstance->loadBundle(std::string {});
 
       SetWindowPos(interopHwnd, 0, 0, 0, createStruct->cx, createStruct->cy, SWP_SHOWWINDOW);
 
