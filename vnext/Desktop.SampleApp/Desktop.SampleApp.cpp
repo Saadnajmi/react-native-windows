@@ -60,7 +60,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   switch (message)
   {
     case WM_CREATE: {
-      static constexpr std::string_view bundlePath = "Samples/text.bundle";
+      static constexpr std::string_view bundlePath = "Samples/text";
       auto createStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
       auto pHwndData = static_cast<HwndData*>(createStruct->lpCreateParams);
 
