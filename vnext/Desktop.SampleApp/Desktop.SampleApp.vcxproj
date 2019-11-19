@@ -184,7 +184,7 @@
     <ClCompile Include="ShadowNodeBase.cpp" />
     <ClCompile Include="ViewViewManager.cpp" />
     <ClInclude Include="FrameworkElementViewManager.h">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

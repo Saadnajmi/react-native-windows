@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-#include "stdafx.h"
 #include "Desktop.SampleApp.h"
+#include "stdafx.h"
 
 #include "DispatcherQueueMessageQueues.h"
 #include "NativeUIManager.h"
@@ -12,12 +12,13 @@
 
 #include <InstanceManager.h>
 
+#include <Modules/AppStateModule.h>
 #include <Modules/UIManagerModule.h>
-#include <winrt/Windows.UI.h>
+#include <Windows.UI.Xaml.Hosting.DesktopWindowXamlSource.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
 #include <winrt/Windows.UI.Xaml.Hosting.h>
 #include <winrt/Windows.UI.Xaml.Media.h>
-#include <Windows.UI.Xaml.Hosting.DesktopWindowXamlSource.h>
+#include <winrt/Windows.UI.h>
 
 namespace WS = winrt::Windows::System;
 namespace WU = winrt::Windows::UI;
@@ -28,24 +29,20 @@ namespace WUXM = ::WUX::Media;
 
 HINSTANCE hinst;
 
-struct HwndData
-{
+struct HwndData {
   winrt::com_ptr<IDesktopWindowXamlSourceNative> desktopWindowXamlSourceNative;
   std::shared_ptr<facebook::react::InstanceWrapper> reactInstance;
 };
 
 // Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
   UNREFERENCED_PARAMETER(lParam);
-  switch (message)
-  {
+  switch (message) {
     case WM_INITDIALOG:
       return (INT_PTR)TRUE;
 
     case WM_COMMAND:
-      if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-      {
+      if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
         EndDialog(hDlg, LOWORD(wParam));
         return (INT_PTR)TRUE;
       }
@@ -54,15 +51,14 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
   return (INT_PTR)FALSE;
 }
 
-LRESULT CALLBACK
-WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-  switch (message)
-  {
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+  using namespace std::string_literals;
+
+  switch (message) {
     case WM_CREATE: {
       static constexpr std::string_view bundlePath = "Samples/text";
       auto createStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
-      auto pHwndData = static_cast<HwndData*>(createStruct->lpCreateParams);
+      auto pHwndData = static_cast<HwndData *>(createStruct->lpCreateParams);
 
       winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->AttachToWindow(hWnd));
 
@@ -70,41 +66,51 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->get_WindowHandle(&interopHwnd));
 
       auto nativeUIManager = std::make_shared<react::uwp::NativeUIManager>();
-      std::string jsBundlePath { bundlePath };
-      std::vector<std::tuple<
-        std::string,
-        facebook::xplat::module::CxxModule::Provider,
-        std::shared_ptr<facebook::react::MessageQueueThread>>> cxxModules;
+      std::string jsBundlePath{bundlePath};
       std::vector<std::unique_ptr<facebook::react::IViewManager>> viewManagers;
       viewManagers.push_back(std::make_unique<react::uwp::ViewViewManager>(nativeUIManager));
       auto uimanager = std::make_shared<facebook::react::UIManager>(std::move(viewManagers), nativeUIManager);
       auto jsQueue = std::make_shared<Microsoft::React::BGThreadDispatcherQueueMessageQueue>();
       auto nativeQueue = std::make_shared<Microsoft::React::UIThreadDispatcherQueueMessageQueue>();
       auto devSettings = std::make_shared<facebook::react::DevSettings>();
+
+      std::vector<std::tuple<
+          std::string,
+          facebook::xplat::module::CxxModule::Provider,
+          std::shared_ptr<facebook::react::MessageQueueThread>>>
+          cxxModules{
+              std::make_tuple(
+                  "AppState"s,
+                  []() {
+                    return std::make_unique<facebook::react::AppStateModule>(
+                        std::make_shared<facebook::react::AppState>());
+                  },
+                  nativeQueue),
+          };
+
       devSettings->useWebDebugger = true;
       devSettings->debugBundlePath = bundlePath;
-      devSettings->errorCallback = [hWnd](std::string err)
-      {
+      devSettings->errorCallback = [hWnd](std::string err) {
         ::MessageBoxA(hWnd, err.c_str(), "React Native Error", MB_OK);
       };
 
       pHwndData->reactInstance = facebook::react::CreateReactInstance(
-        std::move(jsBundlePath),
-        std::move(cxxModules),
-        std::move(uimanager),
-        std::move(jsQueue),
-        std::move(nativeQueue),
-        std::move(devSettings));
+          std::move(jsBundlePath),
+          std::move(cxxModules),
+          std::move(uimanager),
+          std::move(jsQueue),
+          std::move(nativeQueue),
+          std::move(devSettings));
 
-      pHwndData->reactInstance->loadBundle(std::string {});
+      pHwndData->reactInstance->loadBundle(std::string{});
 
       SetWindowPos(interopHwnd, 0, 0, 0, createStruct->cx, createStruct->cy, SWP_SHOWWINDOW);
 
       SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pHwndData));
     } break;
     case WM_WINDOWPOSCHANGED: {
-      auto windowPos = reinterpret_cast<WINDOWPOS*>(lParam);
-      auto pHwndData = reinterpret_cast<HwndData*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+      auto windowPos = reinterpret_cast<WINDOWPOS *>(lParam);
+      auto pHwndData = reinterpret_cast<HwndData *>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 
       HWND interopHwnd;
       winrt::check_hresult(pHwndData->desktopWindowXamlSourceNative->get_WindowHandle(&interopHwnd));
@@ -114,8 +120,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND: {
       int wmId = LOWORD(wParam);
       // Parse the menu selections:
-      switch (wmId)
-      {
+      switch (wmId) {
         case IDM_ABOUT:
           DialogBox(hinst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
           break;
@@ -132,7 +137,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       EndPaint(hWnd, &ps);
     } break;
     case WM_DESTROY: {
-      auto pHwndData = reinterpret_cast<HwndData*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+      auto pHwndData = reinterpret_cast<HwndData *>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
       SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
       delete pHwndData;
       PostQuitMessage(0);
@@ -143,9 +148,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   return 0;
 }
 
-
-ATOM RegisterWindowClass()
-{
+ATOM RegisterWindowClass() {
   WNDCLASSEXW wcex;
 
   wcex.cbSize = sizeof(WNDCLASSEX);
@@ -165,14 +168,12 @@ ATOM RegisterWindowClass()
   return ::RegisterClassExW(&wcex);
 }
 
-int APIENTRY
-wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCmdShow)
-{
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCmdShow) {
   hinst = hInstance;
 
   winrt::init_apartment(winrt::apartment_type::single_threaded);
 
-  WUXH::DesktopWindowXamlSource windowsXamlDesktopSource {};
+  WUXH::DesktopWindowXamlSource windowsXamlDesktopSource{};
 
   auto windowAtom = RegisterWindowClass();
 
@@ -180,24 +181,21 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCm
   hwndData->desktopWindowXamlSourceNative = windowsXamlDesktopSource.as<IDesktopWindowXamlSourceNative>();
 
   HWND hWnd = CreateWindowW(
-    MAKEINTATOM(windowAtom),
-    L"Desktop.SampleApp",
-    WS_OVERLAPPEDWINDOW,
-    CW_USEDEFAULT,
-    CW_USEDEFAULT,
-    CW_USEDEFAULT,
-    CW_USEDEFAULT,
-    nullptr,
-    nullptr,
-    hinst,
-    hwndData.get());
+      MAKEINTATOM(windowAtom),
+      L"Desktop.SampleApp",
+      WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT,
+      CW_USEDEFAULT,
+      CW_USEDEFAULT,
+      CW_USEDEFAULT,
+      nullptr,
+      nullptr,
+      hinst,
+      hwndData.get());
 
-  if (!hWnd)
-  {
+  if (!hWnd) {
     return -1;
-  }
-  else
-  {
+  } else {
     hwndData.release();
   }
 
@@ -211,18 +209,14 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, _In_ int nCm
 
   MSG msg;
   // Main message loop:
-  while (GetMessage(&msg, nullptr, 0, 0))
-  {
-    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-    {
+  while (GetMessage(&msg, nullptr, 0, 0)) {
+    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
       BOOL translated = FALSE;
-      if (desktopWindowXamlSourceNative2)
-      {
+      if (desktopWindowXamlSourceNative2) {
         winrt::check_hresult(desktopWindowXamlSourceNative2->PreTranslateMessage(&msg, &translated));
       }
 
-      if (!translated)
-      {
+      if (!translated) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
       }
