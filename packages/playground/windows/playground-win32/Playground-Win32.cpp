@@ -3,16 +3,26 @@
 
 #include <windows.h>
 
+#pragma push_macro("GetCurrentTime")
+#undef GetCurrentTime
+
+#include <Windows.UI.Xaml.Hosting.DesktopWindowXamlSource.h>
+#include <winrt/Windows.UI.Xaml.Hosting.h>
+
+#pragma pop_macro("GetCurrentTime")
+
+namespace WUXH = winrt::Windows::UI::Xaml::Hosting;
+
 struct WindowData {
   static HINSTANCE s_instance;
 
+  WUXH::DesktopWindowXamlSource m_desktopWindowXamlSource;
+
+  WindowData(const WUXH::DesktopWindowXamlSource &desktopWindowXamlSource)
+      : m_desktopWindowXamlSource(desktopWindowXamlSource) {}
+
   static WindowData *GetFromWindow(HWND hwnd) {
     return reinterpret_cast<WindowData *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-  }
-
-  LRESULT OnDestroy(HWND hwnd, WPARAM wparam, LPARAM lparam) {
-    PostQuitMessage(0);
-    return 0;
   }
 
   LRESULT OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT) {
@@ -24,6 +34,35 @@ struct WindowData {
         PostQuitMessage(0);
         break;
     }
+
+    return 0;
+  }
+
+  LRESULT OnCreate(HWND hwnd, LPCREATESTRUCT createStruct) {
+    auto interop = m_desktopWindowXamlSource.as<IDesktopWindowXamlSourceNative>();
+    // Parent the DesktopWindowXamlSource object to current window
+    winrt::check_hresult(interop->AttachToWindow(hwnd));
+
+    // Get the new child window's hwnd
+    HWND hWndXamlIsland = nullptr;
+    winrt::check_hresult(interop->get_WindowHandle(&hWndXamlIsland));
+
+    SetWindowPos(hWndXamlIsland, nullptr, 0, 0, createStruct->cx, createStruct->cy, SWP_SHOWWINDOW);
+
+    return 0;
+  }
+
+  LRESULT OnDestroy() {
+    PostQuitMessage(0);
+    return 0;
+  }
+
+  LRESULT OnWindowPosChanged(HWND hwnd, const WINDOWPOS *windowPosition) {
+    auto interop = m_desktopWindowXamlSource.as<IDesktopWindowXamlSourceNative>();
+    HWND interopHwnd;
+    winrt::check_hresult(interop->get_WindowHandle(&interopHwnd));
+
+    MoveWindow(interopHwnd, 0, 0, windowPosition->cx, windowPosition->cy, TRUE);
 
     return 0;
   }
@@ -51,12 +90,15 @@ HINSTANCE WindowData::s_instance = reinterpret_cast<HINSTANCE>(&__ImageBase);
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) noexcept {
   switch (message) {
+    case WM_CREATE: {
+      return WindowData::GetFromWindow(hwnd)->OnCreate(hwnd, reinterpret_cast<LPCREATESTRUCT>(lparam));
+    }
     case WM_COMMAND: {
       return WindowData::GetFromWindow(hwnd)->OnCommand(
           hwnd, LOWORD(wparam), reinterpret_cast<HWND>(lparam), HIWORD(wparam));
     }
     case WM_DESTROY: {
-      return WindowData::GetFromWindow(hwnd)->OnDestroy(hwnd, wparam, lparam);
+      return WindowData::GetFromWindow(hwnd)->OnDestroy();
     }
     case WM_NCCREATE: {
       auto cs = reinterpret_cast<CREATESTRUCT *>(lparam);
@@ -64,6 +106,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) 
       WINRT_ASSERT(windowData);
       SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(windowData));
       break;
+    }
+    case WM_WINDOWPOSCHANGED: {
+      return WindowData::GetFromWindow(hwnd)->OnWindowPosChanged(hwnd, reinterpret_cast<const WINDOWPOS *>(lparam));
     }
   }
 
@@ -73,6 +118,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) 
 _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR commandLine, int showCmd) {
   constexpr PCWSTR appName = L"ReactNative Playground (Win32)";
   constexpr PCWSTR windowClassName = L"MS_REACTNATIVE_PLAYGROUND_WIN32";
+
+  winrt::init_apartment(winrt::apartment_type::single_threaded);
+
+  WUXH::DesktopWindowXamlSource desktopXamlSource;
 
   WNDCLASSEXW wcex = {};
   wcex.cbSize = sizeof(WNDCLASSEX);
@@ -89,7 +138,7 @@ _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR 
   WINRT_VERIFY(classId);
   winrt::check_win32(!classId);
 
-  auto windowData = std::make_unique<WindowData>();
+  auto windowData = std::make_unique<WindowData>(desktopXamlSource);
 
   HWND hwnd = CreateWindow(
       windowClassName,
@@ -115,11 +164,22 @@ _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR 
 
   MSG msg = {};
   while (GetMessage(&msg, nullptr, 0, 0)) {
+    auto xamlSourceNative2 = desktopXamlSource.as<IDesktopWindowXamlSourceNative2>();
+    BOOL xamlSourceProcessedMessage = FALSE;
+    winrt::check_hresult(xamlSourceNative2->PreTranslateMessage(&msg, &xamlSourceProcessedMessage));
+    if (xamlSourceProcessedMessage) {
+      continue;
+    }
+
     if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
   }
+
+  windowData.reset();
+
+  winrt::uninit_apartment();
 
   return (int)msg.wParam;
 }
