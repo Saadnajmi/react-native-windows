@@ -98,6 +98,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="Application.manifest" />
@@ -128,6 +129,9 @@
     <ProjectReference Include="$(ReactNativeWindowsExtendedDir)windows\react-native-windows-extended.vcxproj">
       <Project>{e9851bd0-9751-4de7-9ccb-0d2e7493658c}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Playground-Win32.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
