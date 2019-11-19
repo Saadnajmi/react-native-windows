@@ -75,7 +75,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>windowsapp.lib;%(AdditionalDependenices)</AdditionalDependencies>
+      <AdditionalDependencies>user32.lib;windowsapp.lib;%(AdditionalDependenices)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
@@ -103,15 +103,6 @@
   <ItemGroup>
     <Manifest Include="Application.manifest" />
     <None Include="Playground_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Assets\LockScreenLogo.scale-200.png" />
-    <Image Include="Assets\SplashScreen.scale-200.png" />
-    <Image Include="Assets\Square150x150Logo.scale-200.png" />
-    <Image Include="Assets\Square44x44Logo.scale-200.png" />
-    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Image Include="Assets\StoreLogo.png" />
-    <Image Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
